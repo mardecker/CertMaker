@@ -16,12 +16,11 @@ class MainWindow(QMainWindow):
         self.setMinimumSize(400,400)
 
         self.menubar = menubar._create_menu(self)
-
         self.toolbar = toolbar._create_toolbar(self)
 
-        central = QWidget()
-        self.setCentralWidget(central)
+        #central = QWidget()
+        #self.setCentralWidget(central)
 
-        layout = QVBoxLayout(central)
+        #layout = QVBoxLayout(central)
 
-        self.setLayout(layout)
+        #self.setLayout(layout)
