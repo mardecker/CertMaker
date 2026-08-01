@@ -1,33 +1,37 @@
-from PyQt6.QtWidgets import (
-    QMainWindow,
-    QWidget,
-    QVBoxLayout,
-    QPushButton, QLabel, QLineEdit, QGridLayout,
-)
+from PyQt6.QtWidgets import QMainWindow, QStackedWidget
 
-import gui.menubar as menubar
-from gui import toolbar
-from gui.dialogs.certificate_dialog import run_certificate_dialog
+from gui.pages.home_page import HomePage
+#from gui.pages.certificate_page import CertificatePage
+#from gui.pages.csr_page import CsrPage
 
 
 class MainWindow(QMainWindow):
+
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("My App")
-        self.setMinimumSize(800,600)
 
-        self.menubar = menubar._create_menubar(self)
-        #self.toolbar = toolbar._create_toolbar(self)
+        self.stack = QStackedWidget()
 
-        self.button = QPushButton("Create new Certificate")
-        self.button.setFixedSize(200, 50)
-        self.button.clicked.connect(self.create_certificate)
+        self.home_page = HomePage()
+        self.certificate_page = CertificatePage()
+        self.csr_page = CsrPage()
 
-        container = QWidget()
-        layout = QGridLayout(container)
-        layout.addWidget(self.button, 2, 2)
+        self.stack.addWidget(self.home_page)
+        self.stack.addWidget(self.certificate_page)
+        self.stack.addWidget(self.csr_page)
 
-        self.setCentralWidget(container)
+        self.setCentralWidget(self.stack)
 
-    def create_certificate(self):
-        run_certificate_dialog()
+        self.home_page.create_certificate_requested.connect(
+            self.show_certificate_page
+        )
+
+        self.home_page.create_csr_requested.connect(
+            self.show_csr_page
+        )
+
+    def show_certificate_page(self):
+        self.stack.setCurrentWidget(self.certificate_page)
+
+    def show_csr_page(self):
+        self.stack.setCurrentWidget(self.csr_page)
