@@ -1,8 +1,8 @@
 from PyQt6.QtWidgets import QMainWindow, QStackedWidget
 
 from gui.pages.home_page import HomePage
-#from gui.pages.certificate_page import CertificatePage
-#from gui.pages.csr_page import CsrPage
+from gui.pages.certificate_page import CertificatePage
+from gui.pages.csr_page import CsrPage
 
 
 class MainWindow(QMainWindow):
@@ -11,6 +11,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.stack = QStackedWidget()
+        self.setMinimumSize(800, 600)
 
         self.home_page = HomePage()
         self.certificate_page = CertificatePage()
@@ -30,8 +31,15 @@ class MainWindow(QMainWindow):
             self.show_csr_page
         )
 
+        self.certificate_page.action_aborted.connect(
+            self.show_home_page
+        )
+
     def show_certificate_page(self):
         self.stack.setCurrentWidget(self.certificate_page)
 
     def show_csr_page(self):
         self.stack.setCurrentWidget(self.csr_page)
+
+    def show_home_page(self):
+        self.stack.setCurrentWidget(self.home_page)

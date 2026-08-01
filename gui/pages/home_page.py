@@ -1,4 +1,4 @@
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtWidgets import (
     QWidget,
     QLabel,
@@ -15,7 +15,7 @@ class HomePage(QWidget):
     def __init__(self):
         super().__init__()
 
-        title = QLabel("Certificate Creator")
+        title = QLabel("CertManager")
         title.setStyleSheet("font-size:24px; font-weight:bold;")
 
         certificate_button = QPushButton("Create new Certificate")
@@ -41,6 +41,8 @@ class HomePage(QWidget):
         layout.addWidget(csr_button)
         layout.addStretch()
 
-        layout.setAlignment(title)
+        layout.setAlignment(title, Qt.AlignmentFlag.AlignCenter)
+        layout.setAlignment(certificate_button, Qt.AlignmentFlag.AlignHCenter)
+        layout.setAlignment(csr_button, Qt.AlignmentFlag.AlignHCenter)
 
         self.setLayout(layout)
