@@ -1,4 +1,4 @@
-def _create_menu(self):
+def _create_menubar(self):
     menu = self.menuBar()
 
     file_menu = menu.addMenu("Datei")
