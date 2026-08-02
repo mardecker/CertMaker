@@ -1,8 +1,14 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QHBoxLayout, QComboBox, QLineEdit, QPushButton, \
-    QTableWidgetItem, QMessageBox
-
+    QTableWidgetItem, QMessageBox, QGroupBox
+from dataclasses import dataclass
 import ipaddress
 import re
+
+@dataclass
+class SanEntry:
+    type: str
+    value: str
+
 
 class SanWidget(QWidget):
 
@@ -11,13 +17,18 @@ class SanWidget(QWidget):
 
         layout = QVBoxLayout(self)
 
+        SANGroup = QGroupBox("SAN")
+        SANLayout = QVBoxLayout()
+
         self.table = QTableWidget()
         self.table.setColumnCount(2)
         self.table.setHorizontalHeaderLabels(
             ["Type", "Value"]
         )
 
-        layout.addWidget(self.table)
+        self.table.setColumnWidth(1,250)
+
+        SANLayout.addWidget(self.table)
 
 
         input_layout = QHBoxLayout()
@@ -36,13 +47,14 @@ class SanWidget(QWidget):
             self.add_entry
         )
 
-
         input_layout.addWidget(self.type_box)
         input_layout.addWidget(self.value_edit)
         input_layout.addWidget(add_button)
 
 
-        layout.addLayout(input_layout)
+        SANLayout.addLayout(input_layout)
+        SANGroup.setLayout(SANLayout)
+        layout.addWidget(SANGroup)
 
     def add_entry(self):
         san_type = self.type_box.currentText()
@@ -88,15 +100,15 @@ class SanWidget(QWidget):
                 return False
             return True
 
-    def get_entries(self) -> list:
+    def get_entries(self) -> list[SanEntry]:
         entries = []
 
         for row in range(self.table.rowCount()):
             entries.append(
-                {
-                "type" : self.table.item(row, 0).text(),
-                "value": self.table.item(row,1).text()
-                }
+                SanEntry(
+                    type=self.table.item(row, 0).text(),
+                    value=self.table.item(row,1).text()
+                )
             )
 
         return entries

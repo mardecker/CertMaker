@@ -5,10 +5,13 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QVBoxLayout, QGroupBox, QHBoxLayout, QMessageBox, QComboBox,
     QFormLayout,
-    QLineEdit
+    QLineEdit, QCheckBox
 )
 
+from gui.widgets.key_usage_widget import KeyUsageWidget
 from gui.widgets.san_widget import SanWidget
+from models import certificate_spec
+from models.certificate_spec import CertificateSpec
 
 keylengths = {
     "RSA": ["2048", "3072", "4096"],
@@ -35,10 +38,15 @@ class CertificatePage(QWidget):
         self.organization = QLineEdit()
         self.organization_unit = QLineEdit()
         self.locality = QLineEdit()
+        self.state= QLineEdit()
+        self.country = QLineEdit()
         subject_layout.addRow("*Common Name:", self.common_name)
         subject_layout.addRow("*Organization:", self.organization)
         subject_layout.addRow("OU", self.organization_unit)
         subject_layout.addRow("Locality:", self.locality)
+        subject_layout.addRow("State:", self.state)
+        subject_layout.addRow("Country:", self.country)
+
 
         subjectGroup.setLayout(subject_layout)
         #END SUBJECT
@@ -60,9 +68,23 @@ class CertificatePage(QWidget):
         keyGroup.setLayout(keyLayout)
         #END KEYGROUP
 
-        #BEGIN SANWidget
+        #BEGIN SANWIDGET
         self.SANWidget = SanWidget()
-        #END SANWidget
+        #END SANWIDGET
+
+        #BEGIN KEYUSAGEWIDGET
+        self.KeyUsageWidget = KeyUsageWidget()
+        #END KEYUSAGEWIDGET
+
+        #BEGIN ADDITIONAL_INFO
+        additional_Info = QGroupBox("Additional Info")
+        additional_Info_layout = QFormLayout()
+        self.validity_days = QLineEdit()
+        self.is_ca = QCheckBox()
+        additional_Info_layout.addRow("*Validity Days:", self.validity_days)
+        additional_Info_layout.addRow("CA:", self.is_ca)
+
+        additional_Info.setLayout(additional_Info_layout)
 
         # BEGIN BUTTONS
         Buttons = QHBoxLayout()
@@ -92,6 +114,8 @@ class CertificatePage(QWidget):
         layout.addWidget(subjectGroup)
         layout.addWidget(keyGroup)
         layout.addWidget(self.SANWidget)
+        layout.addWidget(self.KeyUsageWidget)
+        layout.addWidget(additional_Info)
         layout.addLayout(Buttons)
 
 
@@ -101,13 +125,42 @@ class CertificatePage(QWidget):
         self.action_aborted.emit()
 
     def continue_dialog(self):
-        if self.validate_input():
-            print(self.common_name.text(), self.organization.text(), self.SANWidget.get_entries())
+        if not self.validate_input():
+            return
+
+        sans = self.SANWidget.get_entries()
+        dns = []
+        ip = []
+        for san in sans:
+            match san.type:
+                case "IP": ip.append(san.value)
+                case "DNS": dns.append(san.value)
+                case _: QMessageBox().warning(self, " ", "san_widget Returned wrong type")
+
+        certificate_spec = CertificateSpec(common_name=self.common_name.text(),
+                                           organization=self.organization.text(),
+                                           organizational_unit=self.organization_unit.text(),
+                                           locality=self.locality.text(), state=self.state.text(),
+                                           country=self.country.text(),
+                                           key_algorithm=self.key_algorithm.currentText(),
+                                           key_spec=self.key_length.currentText(),
+                                           san_dns=dns,
+                                           san_ip=ip,
+                                           validity_days=int(self.validity_days.text()),
+                                           is_ca=self.is_ca.isChecked()
+                                           )
+
 
     def validate_input(self) -> bool:
-        if not self.common_name.text().strip() or not self.organization.text().strip():
+        if not self.common_name.text().strip() or not self.organization.text().strip() or not self.validity_days.text().strip():
             QMessageBox().warning(self, " ", "Please enter all * fields")
             return False
+
+        try:
+            int(self.validity_days.text())
+        except ValueError:
+            QMessageBox().warning(self, " ", "Please enter a valid days as an integer")
+
         return True
 
     def update_keylength(self, algorithm: str):
