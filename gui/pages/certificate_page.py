@@ -147,9 +147,11 @@ class CertificatePage(QWidget):
                                            san_dns=dns,
                                            san_ip=ip,
                                            validity_days=int(self.validity_days.text()),
-                                           is_ca=self.is_ca.isChecked()
+                                           is_ca=self.is_ca.isChecked(),
+                                           key_usage=self.KeyUsageWidget.export_key_usage(),
+                                           extended_key_usage=self.KeyUsageWidget.export_key_extended_usage()
                                            )
-
+        print(certificate_spec)
 
     def validate_input(self) -> bool:
         if not self.common_name.text().strip() or not self.organization.text().strip() or not self.validity_days.text().strip():

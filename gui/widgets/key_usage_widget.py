@@ -2,21 +2,6 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QCheckBox
 from cryptography.x509.oid import ExtendedKeyUsageOID
 from cryptography.x509 import KeyUsage
 
-EXTENDED_KEY_USAGE = {
-    "server_auth": {
-        "name": "Server Authentication",
-        "oid": ExtendedKeyUsageOID.SERVER_AUTH,
-    },
-    "client_auth": {
-        "name": "Client Authentication",
-        "oid": ExtendedKeyUsageOID.CLIENT_AUTH,
-    },
-    "code_signing": {
-        "name": "Code Signing",
-        "oid": ExtendedKeyUsageOID.CODE_SIGNING,
-    },
-}
-
 class KeyUsageWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -36,8 +21,7 @@ class KeyUsageWidget(QWidget):
 
         KeyUsage_layout.addWidget(self.digital_signature,0,0)
         KeyUsage_layout.addWidget(self.key_encipherment,0,1)
-        KeyUsage_layout.addWidget(self.key_agreement,0,2)
-        KeyUsage_layout.addWidget(self.key_cert_sign,0,4)
+        KeyUsage_layout.addWidget(self.key_cert_sign,0,2)
         KeyUsage_layout.addWidget(self.crl_sign,1,0)
         KeyUsageGroup.setLayout(KeyUsage_layout)
         #END KEY-USAGE
@@ -65,11 +49,22 @@ class KeyUsageWidget(QWidget):
     def export_key_usage(self) -> KeyUsage:
         return KeyUsage(
             digital_signature=self.digital_signature.isChecked(),
+            content_commitment=False,
             key_encipherment=self.key_encipherment.isChecked(),
-            key_agreement=self.key_agreement.isChecked(),
+            data_encipherment=False,
+            key_agreement=False,
             key_cert_sign=self.key_cert_sign.isChecked(),
             crl_sign=self.crl_sign.isChecked(),
-            data_encipherment=False,
             encipher_only=False,
-            decipher_only=False
+            decipher_only=False,
         )
+
+    def export_key_extended_usage(self) -> list[ExtendedKeyUsageOID]:
+        extended_usage = []
+        if self.server_auth.isChecked():
+            extended_usage.append(ExtendedKeyUsageOID.SERVER_AUTH)
+        if self.client_auth.isChecked():
+            extended_usage.append(ExtendedKeyUsageOID.CLIENT_AUTH)
+        if self.code_signing.isChecked():
+            extended_usage.append(ExtendedKeyUsageOID.CODE_SIGNING)
+        return extended_usage
