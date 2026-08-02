@@ -1,4 +1,7 @@
 import datetime
+import ipaddress
+from logging import critical
+
 from cryptography import x509
 from cryptography.hazmat._oid import NameOID
 from cryptography.hazmat.primitives import hashes
@@ -35,9 +38,55 @@ class CertificateBuilder:
                    .not_valid_after(datetime.datetime.now(datetime.timezone.utc)
                                     + datetime.timedelta(days=self.certificate_spec.validity_days))
                    )
+
+        builder = builder.add_extension(
+            x509.BasicConstraints(
+                ca=self.certificate_spec.is_ca,
+                path_length=None
+            ),
+            critical=True,
+        )
+
+        #add SAN entries
+        san_entries = []
+        for dns in self.certificate_spec.san_dns:
+            san_entries.append(
+                x509.DNSName(dns)
+            )
+
+        for ip in self.certificate_spec.san_ip:
+            san_entries.append(
+                x509.IPAddress(
+                    ipaddress.ip_address(ip))
+            )
+
+        if san_entries:
+            builder = builder.add_extension(
+                x509.SubjectAlternativeName(san_entries),
+                critical=False,
+            )
+
+        sign_hash = hashes.SHA256()
+        if isinstance(self.private_key,ed25519.Ed25519PrivateKey): #ed25519 can't hash stuff
+            sign_hash = None
+
+        # add Key Usage
+        builder = builder.add_extension(
+            self.certificate_spec.key_usage,
+            critical=True,
+        )
+
+        # add Key Extended Usage
+        builder = builder.add_extension(
+            x509.ExtendedKeyUsage(
+                self.certificate_spec.extended_key_usage
+            ),
+            critical=True,
+        )
+
         return builder.sign(
             private_key=self.private_key,
-            algorithm= hashes.SHA256()
+            algorithm= sign_hash
         )
 
     def generate_private_key(self):

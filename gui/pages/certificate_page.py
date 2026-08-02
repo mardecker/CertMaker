@@ -10,7 +10,9 @@ from PyQt6.QtWidgets import (
 
 from gui.widgets.key_usage_widget import KeyUsageWidget
 from gui.widgets.san_widget import SanWidget
+from gui.dialogs.save_dialog import select_private_key_path, select_certificate_path
 from crypto.certificate_builder import CertificateBuilder
+from crypto.export import export_certificate, export_pkey, export_pkcs12
 from models.certificate_spec import CertificateSpec
 
 keylengths = {
@@ -81,10 +83,16 @@ class CertificatePage(QWidget):
         additional_Info_layout = QFormLayout()
         self.validity_days = QLineEdit()
         self.is_ca = QCheckBox()
+        self.is_pkcs = QCheckBox()
+        self.is_pkcs.setChecked(True)
+
         additional_Info_layout.addRow("*Validity Days:", self.validity_days)
         additional_Info_layout.addRow("CA:", self.is_ca)
+        additional_Info_layout.addRow("PKCS#12:", self.is_pkcs)
+
 
         additional_Info.setLayout(additional_Info_layout)
+        #END ADDITIONAL_INFO
 
         # BEGIN BUTTONS
         Buttons = QHBoxLayout()
@@ -152,6 +160,37 @@ class CertificatePage(QWidget):
                                            extended_key_usage=self.KeyUsageWidget.export_key_extended_usage()
                                            )
         certificate_builder = CertificateBuilder(certificate_spec)
+        private_key = certificate_builder.private_key
+        certificate = certificate_builder.build()["certificate"]
+
+        certpath = select_certificate_path()
+
+        if not certpath:
+            QMessageBox().warning(self, " ", "No certificate file selected")
+            return
+
+        if self.is_pkcs.isChecked():
+            export_pkcs12(certificate=certificate,
+                          path=certpath,
+                          private_key=private_key,
+                          friendly_name=self.common_name.text(),
+                          )
+            QMessageBox().information(self, "Export","Certificate successfully exported")
+            return
+
+        keypath = select_private_key_path()
+
+        if not keypath:
+            QMessageBox().warning(self, " ", "No private key file selected")
+            return
+
+        export_pkey(private_key, keypath)
+        export_certificate(certificate, certpath)
+        QMessageBox().information(self, "Export","Certificate successfully exported")
+        return
+
+
+
 
 
     def validate_input(self) -> bool:

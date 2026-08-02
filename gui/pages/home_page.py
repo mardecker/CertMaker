@@ -15,10 +15,10 @@ class HomePage(QWidget):
     def __init__(self):
         super().__init__()
 
-        title = QLabel("CertManager")
+        title = QLabel("CertMaker")
         title.setStyleSheet("font-size:24px; font-weight:bold;")
 
-        certificate_button = QPushButton("Create new Certificate")
+        certificate_button = QPushButton("Create new self-signed certificate")
         csr_button = QPushButton("Create new CSR")
 
         certificate_button.setFixedSize(250, 50)
@@ -38,11 +38,11 @@ class HomePage(QWidget):
         layout.addWidget(title)
         layout.addSpacing(20)
         layout.addWidget(certificate_button)
-        layout.addWidget(csr_button)
+        #layout.addWidget(csr_button)
         layout.addStretch()
 
         layout.setAlignment(title, Qt.AlignmentFlag.AlignCenter)
         layout.setAlignment(certificate_button, Qt.AlignmentFlag.AlignHCenter)
-        layout.setAlignment(csr_button, Qt.AlignmentFlag.AlignHCenter)
+        #layout.setAlignment(csr_button, Qt.AlignmentFlag.AlignHCenter)
 
         self.setLayout(layout)
