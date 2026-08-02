@@ -3,11 +3,16 @@ from PyQt6.QtWidgets import (
     QWidget,
     QLabel,
     QPushButton,
-    QVBoxLayout, QGroupBox, QHBoxLayout, QMessageBox,
+    QVBoxLayout, QGroupBox, QHBoxLayout, QMessageBox, QComboBox,
     QFormLayout,
     QLineEdit
 )
 
+keylengths = {
+    "RSA": ["2048", "3072", "4096"],
+    "ECDSA": ["P-256", "P-384", "P-521"],
+    "ED25519": ["Ed25519"],
+}
 
 class CertificatePage(QWidget):
     action_aborted = pyqtSignal()
@@ -21,7 +26,6 @@ class CertificatePage(QWidget):
         layout = QVBoxLayout()
 
         # BEGIN SUBJECT
-
         subjectGroup = QGroupBox("Subject")
 
         subject_layout = QFormLayout()
@@ -35,12 +39,28 @@ class CertificatePage(QWidget):
         subject_layout.addRow("Locality:", self.locality)
 
         subjectGroup.setLayout(subject_layout)
-
         #END SUBJECT
 
+        #BEGIN KEYGROUP
         keyGroup = QGroupBox("Key")
-        SANGoup = QGroupBox("SAN Goup")
+        keyLayout = QFormLayout()
+        self.key_algorithm = QComboBox()
+        self.key_algorithm.addItems(["RSA", "ECDSA", "ED25519"])
 
+        self.key_algorithm.currentTextChanged.connect(self.update_keylength)
+
+        self.key_length = QComboBox()
+        self.key_length.addItems(keylengths[self.key_algorithm.currentText()])
+
+        keyLayout.addRow("Key Algorithm:", self.key_algorithm)
+        keyLayout.addRow("Key Length:", self.key_length)
+
+        keyGroup.setLayout(keyLayout)
+        #END KEYGROUP
+
+        #BEGIN SANGROUP
+        SANGoup = QGroupBox("SAN Goup")
+        #ENDSANGROUP
 
         # BEGIN BUTTONS
         Buttons = QHBoxLayout()
@@ -68,6 +88,7 @@ class CertificatePage(QWidget):
 
 
         layout.addWidget(subjectGroup)
+        layout.addWidget(keyGroup)
         layout.addLayout(Buttons)
 
 
@@ -85,3 +106,7 @@ class CertificatePage(QWidget):
             QMessageBox().warning(self, " ", "Please enter all * fields")
             return False
         return True
+
+    def update_keylength(self, algorithm: str):
+        self.key_length.clear()
+        self.key_length.addItems(keylengths[algorithm])
