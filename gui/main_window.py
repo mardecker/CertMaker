@@ -11,7 +11,6 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.stack = QStackedWidget()
-        self.setMinimumSize(800, 600)
 
         self.home_page = HomePage()
         self.certificate_page = CertificatePage()
