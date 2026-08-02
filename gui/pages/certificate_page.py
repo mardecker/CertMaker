@@ -61,7 +61,7 @@ class CertificatePage(QWidget):
         #END KEYGROUP
 
         #BEGIN SANWidget
-        SANWidget = SanWidget()
+        self.SANWidget = SanWidget()
         #END SANWidget
 
         # BEGIN BUTTONS
@@ -91,7 +91,7 @@ class CertificatePage(QWidget):
 
         layout.addWidget(subjectGroup)
         layout.addWidget(keyGroup)
-        layout.addWidget(SANWidget)
+        layout.addWidget(self.SANWidget)
         layout.addLayout(Buttons)
 
 
@@ -102,7 +102,7 @@ class CertificatePage(QWidget):
 
     def continue_dialog(self):
         if self.validate_input():
-            print(self.common_name.text(), self.organization.text())
+            print(self.common_name.text(), self.organization.text(), self.SANWidget.get_entries())
 
     def validate_input(self) -> bool:
         if not self.common_name.text().strip() or not self.organization.text().strip():
