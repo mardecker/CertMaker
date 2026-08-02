@@ -97,6 +97,7 @@ class SanWidget(QWidget):
                     QMessageBox.warning(self, " ", "DNS Name not valid")
                     return False
             return True
+
         if san_type == "IP":
             try:
                 ipaddress.ip_address(san_value)
@@ -104,6 +105,9 @@ class SanWidget(QWidget):
                 QMessageBox.warning(self, " ", "Not a valid IP address")
                 return False
             return True
+
+        QMessageBox.warning(self, " ", "Unkown SAN-Type")
+        return False
 
     def get_entries(self) -> list[SanEntry]:
         entries = []
@@ -117,3 +121,6 @@ class SanWidget(QWidget):
             )
 
         return entries
+
+    def clear_table(self):
+        self.table.setRowCount(0)

@@ -100,7 +100,7 @@ class CertificatePage(QWidget):
         b_abort = QPushButton("abort")
         b_abort.setFixedSize(200,50)
         b_abort.clicked.connect(
-            self.action_aborted.emit
+            self.abort_action
         )
 
         b_continue = QPushButton("continue")
@@ -129,7 +129,8 @@ class CertificatePage(QWidget):
 
         self.setLayout(layout)
 
-    def show_home_page(self):
+    def abort_action(self):
+        self.SANWidget.clear_table()
         self.action_aborted.emit()
 
     def continue_dialog(self):
