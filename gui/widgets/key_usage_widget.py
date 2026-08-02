@@ -1,5 +1,4 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QGroupBox
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QCheckBox, QGroupBox, QGridLayout
 from cryptography.x509.oid import ExtendedKeyUsageOID
 from cryptography.x509 import KeyUsage
 
@@ -26,27 +25,51 @@ class KeyUsageWidget(QWidget):
 
         # BEGIN KEY-USAGE
         KeyUsageGroup = QGroupBox("Key Usage")
-        KeyUsage_layout = QHBoxLayout()
+        KeyUsage_layout = QGridLayout()
         self.digital_signature = QCheckBox("Digital Signature")
         self.digital_signature.setChecked(True)
-        self.key_enchipherment = QCheckBox("Key Encipherment")
-        self.key_enchipherment.setChecked(True)
+        self.key_encipherment = QCheckBox("Key Encipherment")
+        self.key_encipherment.setChecked(True)
         self.key_agreement = QCheckBox("Key Agreement")
-        self.key_certsign = QCheckBox("Key Certificate Signing")
+        self.key_cert_sign = QCheckBox("Key Certificate Signing")
         self.crl_sign = QCheckBox("CRL Signing")
 
-        KeyUsage_layout.addWidget(self.digital_signature)
-        KeyUsage_layout.addWidget(self.key_enchipherment)
-        KeyUsage_layout.addWidget(self.key_agreement)
-        KeyUsage_layout.addWidget(self.key_certsign)
-        KeyUsage_layout.addWidget(self.crl_sign)
+        KeyUsage_layout.addWidget(self.digital_signature,0,0)
+        KeyUsage_layout.addWidget(self.key_encipherment,0,1)
+        KeyUsage_layout.addWidget(self.key_agreement,0,2)
+        KeyUsage_layout.addWidget(self.key_cert_sign,0,4)
+        KeyUsage_layout.addWidget(self.crl_sign,1,0)
         KeyUsageGroup.setLayout(KeyUsage_layout)
         #END KEY-USAGE
 
         #BEGIN KEY-EXTENDED-USAGE
-        KeyExtended_layout = QHBoxLayout()
-        KeyExtended_layout.addWidget(QLabel("Key Extended Usage"))
+        KeyExtendedGroup = QGroupBox("Key Extended Usage")
+        KeyExtended_layout = QGridLayout()
+
+        self.server_auth = QCheckBox("Server Authentication")
+        self.server_auth.setChecked(True)
+        self.client_auth = QCheckBox("Client Authentication")
+        self.client_auth.setChecked(True)
+        self.code_signing = QCheckBox("Code Signing")
+
+        KeyExtended_layout.addWidget(self.server_auth,0,0)
+        KeyExtended_layout.addWidget(self.client_auth,0,1)
+        KeyExtended_layout.addWidget(self.code_signing,0,2)
+
+        KeyExtendedGroup.setLayout(KeyExtended_layout)
         #END KEY-EXTENDED-USAGE
 
         layout.addWidget(KeyUsageGroup)
-        layout.addLayout(KeyExtended_layout)
+        layout.addWidget(KeyExtendedGroup)
+
+    def export_key_usage(self) -> KeyUsage:
+        return KeyUsage(
+            digital_signature=self.digital_signature.isChecked(),
+            key_encipherment=self.key_encipherment.isChecked(),
+            key_agreement=self.key_agreement.isChecked(),
+            key_cert_sign=self.key_cert_sign.isChecked(),
+            crl_sign=self.crl_sign.isChecked(),
+            data_encipherment=False,
+            encipher_only=False,
+            decipher_only=False
+        )

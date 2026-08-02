@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QTableWidget, QHBoxLayout, QComboBox, QLineEdit, QPushButton, \
-    QTableWidgetItem, QMessageBox, QGroupBox
+    QTableWidgetItem, QMessageBox, QGroupBox, QHeaderView
 from dataclasses import dataclass
 import ipaddress
 import re
@@ -26,7 +26,12 @@ class SanWidget(QWidget):
             ["Type", "Value"]
         )
 
-        self.table.setColumnWidth(1,250)
+        self.table.setColumnWidth(0,100)
+
+        header = self.table.horizontalHeader()
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+
+        self.table.setColumnWidth(1,300)
 
         SANLayout.addWidget(self.table)
 
