@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import (
 
 from gui.widgets.key_usage_widget import KeyUsageWidget
 from gui.widgets.san_widget import SanWidget
-from models import certificate_spec
+from crypto.certificate_builder import CertificateBuilder
 from models.certificate_spec import CertificateSpec
 
 keylengths = {
@@ -151,7 +151,8 @@ class CertificatePage(QWidget):
                                            key_usage=self.KeyUsageWidget.export_key_usage(),
                                            extended_key_usage=self.KeyUsageWidget.export_key_extended_usage()
                                            )
-        print(certificate_spec)
+        certificate_builder = CertificateBuilder(certificate_spec)
+
 
     def validate_input(self) -> bool:
         if not self.common_name.text().strip() or not self.organization.text().strip() or not self.validity_days.text().strip():

@@ -1,5 +1,7 @@
-from unittest import case
-
+import datetime
+from cryptography import x509
+from cryptography.hazmat._oid import NameOID
+from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, ec, ed25519
 from models.certificate_spec import CertificateSpec
 
@@ -7,18 +9,51 @@ from models.certificate_spec import CertificateSpec
 class CertificateBuilder:
     def __init__(self, certificate_spec: CertificateSpec):
         self.certificate_spec = certificate_spec
+        self.private_key = self.generate_private_key()
+        self.public_key = self.private_key.public_key()
 
+    def build(self  ):
+        certificate = self.build_certificate()
+        return {
+            "private_key": self.private_key,
+            "certificate": certificate,
+        }
+
+    def build_certificate(self):
+        subject = issuer = x509.Name([
+            x509.NameAttribute(
+                NameOID.COMMON_NAME,
+                self.certificate_spec.common_name,
+            )
+        ])
+        builder = (x509.CertificateBuilder()
+                   .subject_name(subject)
+                   .issuer_name(issuer)
+                   .public_key(self.public_key)
+                   .serial_number(x509.random_serial_number())
+                   .not_valid_before(datetime.datetime.now(datetime.timezone.utc))
+                   .not_valid_after(datetime.datetime.now(datetime.timezone.utc)
+                                    + datetime.timedelta(days=self.certificate_spec.validity_days))
+                   )
+        return builder.sign(
+            private_key=self.private_key,
+            algorithm= hashes.SHA256()
+        )
+
+    def generate_private_key(self):
         match self.certificate_spec.key_algorithm:
             case "RSA":
-                self.gen_rsa_key()
+                key = self.gen_rsa_key()
             case "ECDSA":
-                self.gen_ecdsa_key()
+                key = self.gen_ecdsa_key()
             case "ED25519":
-                self.gen_ed25519_key()
+                key = self.gen_ed25519_key()
             case _:
                 raise ValueError(
                     f"Unsupported key algorithm: {self.certificate_spec.key_algorithm}"
                 )
+        return key
+
 
     def gen_rsa_key(self):
         key_size = int(self.certificate_spec.key_spec)
