@@ -8,6 +8,8 @@ from PyQt6.QtWidgets import (
     QLineEdit
 )
 
+from gui.widgets.san_widget import SanWidget
+
 keylengths = {
     "RSA": ["2048", "3072", "4096"],
     "ECDSA": ["P-256", "P-384", "P-521"],
@@ -58,9 +60,9 @@ class CertificatePage(QWidget):
         keyGroup.setLayout(keyLayout)
         #END KEYGROUP
 
-        #BEGIN SANGROUP
-        SANGoup = QGroupBox("SAN Goup")
-        #ENDSANGROUP
+        #BEGIN SANWidget
+        SANWidget = SanWidget()
+        #END SANWidget
 
         # BEGIN BUTTONS
         Buttons = QHBoxLayout()
@@ -89,6 +91,7 @@ class CertificatePage(QWidget):
 
         layout.addWidget(subjectGroup)
         layout.addWidget(keyGroup)
+        layout.addWidget(SANWidget)
         layout.addLayout(Buttons)
 
 
