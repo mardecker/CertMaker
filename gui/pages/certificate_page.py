@@ -18,7 +18,7 @@ from models.certificate_spec import CertificateSpec
 keylengths = {
     "RSA": ["2048", "3072", "4096"],
     "ECDSA": ["P-256", "P-384", "P-521"],
-    "ED25519": ["Ed25519"],
+    "ED25519": ["ED25519"],
 }
 
 class CertificatePage(QWidget):
@@ -148,8 +148,9 @@ class CertificatePage(QWidget):
         certificate_spec = CertificateSpec(common_name=self.common_name.text(),
                                            organization=self.organization.text(),
                                            organizational_unit=self.organization_unit.text(),
-                                           locality=self.locality.text(), state=self.state.text(),
-                                           country=self.country.text(),
+                                           locality=self.locality.text(),
+                                           state=self.state.text(),
+                                           country=self.country.text().strip().upper(),
                                            key_algorithm=self.key_algorithm.currentText(),
                                            key_spec=self.key_length.currentText(),
                                            san_dns=dns,
@@ -202,6 +203,15 @@ class CertificatePage(QWidget):
             int(self.validity_days.text())
         except ValueError:
             QMessageBox().warning(self, " ", "Please enter a valid days as an integer")
+            return False
+
+        if(int(self.validity_days.text()) <= 0):
+            QMessageBox().warning(self, " ", "Number of days must be greater than 0")
+            return False
+
+        if len(self.country.text().strip()) != 2:
+            QMessageBox().warning(self, " ", "Please enter a valid country code")
+            return False
 
         return True
 

@@ -6,6 +6,8 @@ from cryptography import x509
 from cryptography.hazmat._oid import NameOID
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, ec, ed25519
+
+from models import certificate_spec
 from models.certificate_spec import CertificateSpec
 
 
@@ -23,12 +25,48 @@ class CertificateBuilder:
         }
 
     def build_certificate(self):
-        subject = issuer = x509.Name([
+        subject_attributes = []
+
+        subject_attributes.append(
             x509.NameAttribute(
                 NameOID.COMMON_NAME,
                 self.certificate_spec.common_name,
             )
-        ])
+        )
+
+        subject_attributes.append(
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, self.certificate_spec.organization)
+        )
+
+        if self.certificate_spec.organizational_unit != "":
+            subject_attributes.append(
+                x509.NameAttribute(
+                    NameOID.ORGANIZATIONAL_UNIT_NAME, self.certificate_spec.organizational_unit
+                )
+            )
+
+        if self.certificate_spec.locality != "":
+            subject_attributes.append(
+                x509.NameAttribute(
+                    NameOID.LOCALITY_NAME, self.certificate_spec.locality
+                )
+            )
+
+        if self.certificate_spec.state != "":
+            subject_attributes.append(
+                x509.NameAttribute(
+                    NameOID.STATE_OR_PROVINCE_NAME, self.certificate_spec.state
+                )
+            )
+        if self.certificate_spec.country != "":
+            subject_attributes.append(
+                x509.NameAttribute(
+                    NameOID.COUNTRY_NAME, self.certificate_spec.country
+                )
+            )
+
+        subject = issuer = x509.Name(subject_attributes)
+
         builder = (x509.CertificateBuilder()
                    .subject_name(subject)
                    .issuer_name(issuer)

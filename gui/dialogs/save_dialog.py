@@ -12,12 +12,18 @@ def select_private_key_path(parent=None):
     return filename
 
 
-def select_certificate_path(parent=None):
+def select_certificate_path(parent=None, is_p12=False):
+    directory = "crt.pem"
+    filter= "Certificate (*.crt *.cer *.pem)"
+    if is_p12:
+        directory = "crt.pem"
+        filter = "Certificate (*.pfx *.p12)"
+
     filename, _ = QFileDialog.getSaveFileName(
         parent,
         "Zertifikat speichern",
-        "crt.pem",
-        "Certificate (*.crt *.cer *.pem)"
+        directory,
+        filter
     )
 
     return filename
