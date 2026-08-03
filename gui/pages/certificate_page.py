@@ -206,11 +206,11 @@ class CertificatePage(QWidget):
             QMessageBox().warning(self, " ", "Please enter a valid days as an integer")
             return False
 
-        if(int(self.validity_days.text()) <= 0):
+        if int(self.validity_days.text()) <= 0:
             QMessageBox().warning(self, " ", "Number of days must be greater than 0")
             return False
 
-        if len(self.country.text().strip()) != 2:
+        if self.country.text() and len(self.country.text().strip()) != 2:
             QMessageBox().warning(self, " ", "Please enter a valid country code")
             return False
 
