@@ -23,7 +23,7 @@ keylengths = {
 }
 
 hash_algorithms = {
-    "RSA": ["SHA-256", "SHA-384", "SHA-512", "bla"],
+    "RSA": ["SHA-256", "SHA-384", "SHA-512"],
     "ECDSA": ["SHA-256", "SHA-384", "SHA-512"],
     "ED25519": ["ED25519"],
 }
