@@ -24,7 +24,7 @@ class CertificateSpec:
     country: str = ""
     key_algorithm: str = "RSA"
     key_spec: str = "4096"
-    signature_hash = "SHA256"
+    signature_hash: str = "SHA256"
     san_dns: list[str] = field(default_factory=list)
     san_ip: list[str] = field(default_factory=list)
     validity_days: int = 365

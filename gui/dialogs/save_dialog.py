@@ -16,7 +16,7 @@ def select_certificate_path(parent=None, is_p12=False):
     directory = "crt.pem"
     filter= "Certificate (*.crt *.cer *.pem)"
     if is_p12:
-        directory = "crt.pem"
+        directory = "crt.p12"
         filter = "Certificate (*.pfx *.p12)"
 
     filename, _ = QFileDialog.getSaveFileName(

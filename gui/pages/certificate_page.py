@@ -7,6 +7,7 @@ from PyQt6.QtWidgets import (
     QFormLayout,
     QLineEdit, QCheckBox
 )
+from cryptography.hazmat.primitives.hashes import SHA256
 
 from gui.widgets.key_usage_widget import KeyUsageWidget
 from gui.widgets.san_widget import SanWidget
@@ -18,6 +19,12 @@ from models.certificate_spec import CertificateSpec
 keylengths = {
     "RSA": ["2048", "3072", "4096"],
     "ECDSA": ["P-256", "P-384", "P-521"],
+    "ED25519": ["ED25519"],
+}
+
+hash_algorithms = {
+    "RSA": ["SHA-256", "SHA-384", "SHA-512", "bla"],
+    "ECDSA": ["SHA-256", "SHA-384", "SHA-512"],
     "ED25519": ["ED25519"],
 }
 
@@ -59,13 +66,17 @@ class CertificatePage(QWidget):
         self.key_algorithm = QComboBox()
         self.key_algorithm.addItems(["RSA", "ECDSA", "ED25519"])
 
-        self.key_algorithm.currentTextChanged.connect(self.update_keylength)
+        self.key_algorithm.currentTextChanged.connect(self.update_crypt_properties)
 
-        self.key_length = QComboBox()
-        self.key_length.addItems(keylengths[self.key_algorithm.currentText()])
+        self.key_specs = QComboBox()
+        self.key_specs.addItems(keylengths[self.key_algorithm.currentText()])
+
+        self.hash_algorithm = QComboBox()
+        self.hash_algorithm.addItems(hash_algorithms[self.key_algorithm.currentText()])
 
         keyLayout.addRow("Key Algorithm:", self.key_algorithm)
-        keyLayout.addRow("Key Length:", self.key_length)
+        keyLayout.addRow("Key Specs:", self.key_specs)
+        keyLayout.addRow("Hash Algorithm:", self.hash_algorithm)
 
         keyGroup.setLayout(keyLayout)
         #END KEYGROUP
@@ -153,7 +164,8 @@ class CertificatePage(QWidget):
                                            state=self.state.text(),
                                            country=self.country.text().strip().upper(),
                                            key_algorithm=self.key_algorithm.currentText(),
-                                           key_spec=self.key_length.currentText(),
+                                           key_spec=self.key_specs.currentText(),
+                                           signature_hash = self.hash_algorithm.currentText(),
                                            san_dns=dns,
                                            san_ip=ip,
                                            validity_days=int(self.validity_days.text()),
@@ -161,11 +173,14 @@ class CertificatePage(QWidget):
                                            key_usage=self.KeyUsageWidget.export_key_usage(),
                                            extended_key_usage=self.KeyUsageWidget.export_key_extended_usage()
                                            )
+
         certificate_builder = CertificateBuilder(certificate_spec)
+
         private_key = certificate_builder.private_key
+
         certificate = certificate_builder.build()["certificate"]
 
-        certpath = select_certificate_path()
+        certpath = select_certificate_path(parent=self, is_p12= self.is_pkcs.isChecked())
 
         if not certpath:
             QMessageBox().warning(self, " ", "No certificate file selected")
@@ -175,7 +190,7 @@ class CertificatePage(QWidget):
             export_pkcs12(certificate=certificate,
                           path=certpath,
                           private_key=private_key,
-                          friendly_name=self.common_name.text(),
+                          friendly_name=self.common_name.text()
                           )
             QMessageBox().information(self, "Export","Certificate successfully exported")
             return
@@ -216,6 +231,8 @@ class CertificatePage(QWidget):
 
         return True
 
-    def update_keylength(self, algorithm: str):
-        self.key_length.clear()
-        self.key_length.addItems(keylengths[algorithm])
+    def update_crypt_properties(self, algorithm: str):
+        self.key_specs.clear()
+        self.key_specs.addItems(keylengths[algorithm])
+        self.hash_algorithm.clear()
+        self.hash_algorithm.addItems(hash_algorithms[algorithm])

@@ -1,19 +1,17 @@
 import datetime
 import ipaddress
-from logging import critical
 
 from cryptography import x509
 from cryptography.hazmat._oid import NameOID
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, ec, ed25519
 
-from models import certificate_spec
 from models.certificate_spec import CertificateSpec
 
 
 class CertificateBuilder:
-    def __init__(self, certificate_spec: CertificateSpec):
-        self.certificate_spec = certificate_spec
+    def __init__(self, cert_spec: CertificateSpec):
+        self.certificate_spec = cert_spec
         self.private_key = self.generate_private_key()
         self.public_key = self.private_key.public_key()
 
@@ -58,6 +56,9 @@ class CertificateBuilder:
                     NameOID.STATE_OR_PROVINCE_NAME, self.certificate_spec.state
                 )
             )
+
+
+
         if self.certificate_spec.country != "":
             subject_attributes.append(
                 x509.NameAttribute(
@@ -104,7 +105,17 @@ class CertificateBuilder:
                 critical=False,
             )
 
-        sign_hash = hashes.SHA256()
+        sign_hash = hashes.SHA256() # default case
+
+        match self.certificate_spec.signature_hash:
+            case "SHA-256": sign_hash = hashes.SHA256()
+            case "SHA-384": sign_hash = hashes.SHA384()
+            case "SHA-512": sign_hash = hashes.SHA512()
+            case "ED25519": sign_hash = None
+            case _:
+                raise ValueError(f"Unsupported signature algorithm: {self.certificate_spec.signature_hash}")
+
+
         if isinstance(self.private_key,ed25519.Ed25519PrivateKey): #ed25519 can't hash stuff
             sign_hash = None
 
@@ -156,7 +167,7 @@ class CertificateBuilder:
                 secp_alg = ec.SECP256R1()
             case "P-384":
                 secp_alg = ec.SECP384R1()
-            case "P-512":
+            case "P-521":
                 secp_alg = ec.SECP256R1()
             case _:
                 raise ValueError("Unsupported ECDSA algorithm")
