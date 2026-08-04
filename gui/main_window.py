@@ -44,6 +44,10 @@ class MainWindow(QMainWindow):
             self.show_home_page
         )
 
+        self.csr_page.action_aborted.connect(
+            self.show_home_page
+        )
+
     def show_certificate_page(self):
         self.stack.setCurrentWidget(self.scroll_certificate)
 
