@@ -22,10 +22,13 @@ class MainWindow(QMainWindow):
         self.scroll_certificate = QScrollArea()
         self.scroll_certificate.setWidgetResizable(True)
         self.scroll_certificate.setWidget(self.certificate_page)
+        self.scroll_csr = QScrollArea()
+        self.scroll_csr.setWidgetResizable(True)
+        self.scroll_csr.setWidget(self.csr_page)
 
         self.stack.addWidget(self.home_page)
         self.stack.addWidget(self.scroll_certificate)
-        self.stack.addWidget(self.csr_page)
+        self.stack.addWidget(self.scroll_csr)
 
         self.setCentralWidget(self.stack)
 
@@ -45,7 +48,7 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentWidget(self.scroll_certificate)
 
     def show_csr_page(self):
-        self.stack.setCurrentWidget(self.csr_page)
+        self.stack.setCurrentWidget(self.scroll_csr)
 
     def show_home_page(self):
         self.stack.setCurrentWidget(self.home_page)
