@@ -168,7 +168,7 @@ class CertificateBuilder:
             case "P-384":
                 secp_alg = ec.SECP384R1()
             case "P-521":
-                secp_alg = ec.SECP256R1()
+                secp_alg = ec.SECP521R1()
             case _:
                 raise ValueError("Unsupported ECDSA algorithm")
         return ec.generate_private_key(
