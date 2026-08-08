@@ -7,14 +7,13 @@ from PyQt6.QtWidgets import (
     QFormLayout,
     QLineEdit, QCheckBox
 )
-from cryptography.hazmat.primitives.hashes import SHA256
 
 from gui.widgets.key_usage_widget import KeyUsageWidget
 from gui.widgets.san_widget import SanWidget
-from gui.dialogs.save_dialog import select_private_key_path, select_certificate_path
-from crypto.certificate_builder import CertificateBuilder
-from crypto.export import export_certificate, export_pkey, export_pkcs12
-from models.certificate_spec import CertificateSpec
+from gui.dialogs.save_dialog import select_private_key_path, select_certificate_path, select_csr_path
+from crypto.csr_builder import CSRBuilder
+from crypto.export import export_certificate, export_pkey, export_pkcs12, export_csr
+from models.csr_spec import CsrSpec
 
 keylengths = {
     "RSA": ["2048", "3072", "4096"],
@@ -140,7 +139,7 @@ class CsrPage(QWidget):
                 case "DNS": dns.append(san.value)
                 case _: QMessageBox().warning(self, " ", "san_widget Returned wrong type")
 
-        certificate_spec = CertificateSpec(common_name=self.common_name.text(),
+        csr_spec = CsrSpec(common_name=self.common_name.text(),
                                            organization=self.organization.text(),
                                            organizational_unit=self.organization_unit.text(),
                                            locality=self.locality.text(),
@@ -151,31 +150,20 @@ class CsrPage(QWidget):
                                            signature_hash = self.hash_algorithm.currentText(),
                                            san_dns=dns,
                                            san_ip=ip,
-                                           validity_days=int(self.validity_days.text()),
-                                           is_ca=self.is_ca.isChecked(),
                                            key_usage=self.KeyUsageWidget.export_key_usage(),
                                            extended_key_usage=self.KeyUsageWidget.export_key_extended_usage()
                                            )
 
-        certificate_builder = CertificateBuilder(certificate_spec)
+        csr_builder = CSRBuilder(csr_spec)
 
-        private_key = certificate_builder.private_key
+        private_key = csr_builder.private_key
 
-        certificate = certificate_builder.build()["certificate"]
+        csr = csr_builder.build()["certificate"]
 
-        certpath = select_certificate_path(parent=self, is_p12= self.is_pkcs.isChecked())
+        certpath = select_csr_path(parent=self)
 
         if not certpath:
-            QMessageBox().warning(self, " ", "No certificate file selected")
-            return
-
-        if self.is_pkcs.isChecked():
-            export_pkcs12(certificate=certificate,
-                          path=certpath,
-                          private_key=private_key,
-                          friendly_name=self.common_name.text()
-                          )
-            QMessageBox().information(self, "Export","Certificate successfully exported")
+            QMessageBox().warning(self, " ", "No csr file selected")
             return
 
         keypath = select_private_key_path()
@@ -185,23 +173,13 @@ class CsrPage(QWidget):
             return
 
         export_pkey(private_key, keypath)
-        export_certificate(certificate, certpath)
+        export_csr(csr, certpath)
         QMessageBox().information(self, "Export","Certificate successfully exported")
         return
 
     def validate_input(self) -> bool:
-        if not self.common_name.text().strip() or not self.organization.text().strip() or not self.validity_days.text().strip():
+        if not self.common_name.text().strip() or not self.organization.text().strip():
             QMessageBox().warning(self, " ", "Please enter all * fields")
-            return False
-
-        try:
-            int(self.validity_days.text())
-        except ValueError:
-            QMessageBox().warning(self, " ", "Please enter a valid days as an integer")
-            return False
-
-        if int(self.validity_days.text()) <= 0:
-            QMessageBox().warning(self, " ", "Number of days must be greater than 0")
             return False
 
         if self.country.text() and len(self.country.text().strip()) != 2:

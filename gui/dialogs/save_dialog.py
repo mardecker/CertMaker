@@ -27,3 +27,15 @@ def select_certificate_path(parent=None, is_p12=False):
     )
 
     return filename
+
+def select_csr_path(parent=None):
+    directory = "csr.pem"
+    filter= "Certificate (*.csr *.pem)"
+    filename, _ = QFileDialog.getSaveFileName(
+        parent,
+        "CSR speichern",
+        directory,
+        filter
+    )
+
+    return filename

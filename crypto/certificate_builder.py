@@ -7,12 +7,13 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, ec, ed25519
 
 from models.certificate_spec import CertificateSpec
+from crypto.key_generator import generate_private_key
 
 
 class CertificateBuilder:
     def __init__(self, cert_spec: CertificateSpec):
         self.certificate_spec = cert_spec
-        self.private_key = self.generate_private_key()
+        self.private_key = generate_private_key(cert_spec.key_algorithm, cert_spec.key_spec)
         self.public_key = self.private_key.public_key()
 
     def build(self  ):
@@ -137,43 +138,3 @@ class CertificateBuilder:
             private_key=self.private_key,
             algorithm= sign_hash
         )
-
-    def generate_private_key(self):
-        match self.certificate_spec.key_algorithm:
-            case "RSA":
-                key = self.gen_rsa_key()
-            case "ECDSA":
-                key = self.gen_ecdsa_key()
-            case "ED25519":
-                key = self.gen_ed25519_key()
-            case _:
-                raise ValueError(
-                    f"Unsupported key algorithm: {self.certificate_spec.key_algorithm}"
-                )
-        return key
-
-
-    def gen_rsa_key(self):
-        key_size = int(self.certificate_spec.key_spec)
-        return rsa.generate_private_key(
-            public_exponent=65537,
-            key_size=key_size,
-        )
-
-    def gen_ecdsa_key(self):
-        key_spec = self.certificate_spec.key_spec
-        match key_spec:
-            case "P-256":
-                secp_alg = ec.SECP256R1()
-            case "P-384":
-                secp_alg = ec.SECP384R1()
-            case "P-521":
-                secp_alg = ec.SECP521R1()
-            case _:
-                raise ValueError("Unsupported ECDSA algorithm")
-        return ec.generate_private_key(
-            secp_alg
-        )
-
-    def gen_ed25519_key(self):
-        return ed25519.Ed25519PrivateKey.generate()

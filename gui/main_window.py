@@ -21,9 +21,11 @@ class MainWindow(QMainWindow):
         # make CertificatePage scrollable
         self.scroll_certificate = QScrollArea()
         self.scroll_certificate.setWidgetResizable(True)
+        self.scroll_certificate.setMinimumSize(400,600)
         self.scroll_certificate.setWidget(self.certificate_page)
         self.scroll_csr = QScrollArea()
         self.scroll_csr.setWidgetResizable(True)
+        self.scroll_csr.setMinimumSize(400,600)
         self.scroll_csr.setWidget(self.csr_page)
 
         self.stack.addWidget(self.home_page)

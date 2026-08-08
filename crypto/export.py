@@ -20,7 +20,6 @@ def export_certificate(certificate, path):
             )
         )
 
-
 def export_pkcs12(certificate, private_key, path, friendly_name):
     p12_data = pkcs12.serialize_key_and_certificates(
         name=friendly_name.encode(),
@@ -32,3 +31,12 @@ def export_pkcs12(certificate, private_key, path, friendly_name):
 
     with open(path, "wb") as f:
         f.write(p12_data)
+
+
+def export_csr(csr, path):
+    with open (path, "wb") as f:
+        f.write(
+            csr.public_bytes(
+                encoding=serialization.Encoding.PEM,
+            )
+        )
