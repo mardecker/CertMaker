@@ -14,7 +14,6 @@ class KeyUsageWidget(QWidget):
         self.digital_signature = QCheckBox("Digital Signature")
         self.digital_signature.setChecked(True)
         self.key_encipherment = QCheckBox("Key Encipherment")
-        self.key_encipherment.setChecked(True)
         self.key_agreement = QCheckBox("Key Agreement")
         self.key_cert_sign = QCheckBox("Key Certificate Signing")
         self.crl_sign = QCheckBox("CRL Signing")
@@ -35,10 +34,12 @@ class KeyUsageWidget(QWidget):
         self.client_auth = QCheckBox("Client Authentication")
         self.client_auth.setChecked(True)
         self.code_signing = QCheckBox("Code Signing")
+        self.ipsec_ike = QCheckBox("IPSEC IKE")
 
         KeyExtended_layout.addWidget(self.server_auth,0,0)
         KeyExtended_layout.addWidget(self.client_auth,0,1)
         KeyExtended_layout.addWidget(self.code_signing,0,2)
+        KeyExtended_layout.addWidget(self.ipsec_ike,1,0)
 
         KeyExtendedGroup.setLayout(KeyExtended_layout)
         #END KEY-EXTENDED-USAGE
@@ -67,4 +68,6 @@ class KeyUsageWidget(QWidget):
             extended_usage.append(ExtendedKeyUsageOID.CLIENT_AUTH)
         if self.code_signing.isChecked():
             extended_usage.append(ExtendedKeyUsageOID.CODE_SIGNING)
+        if self.ipsec_ike.isChecked():
+            extended_usage.append(ExtendedKeyUsageOID.IPSEC_IKE)
         return extended_usage

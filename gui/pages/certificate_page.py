@@ -7,7 +7,6 @@ from PyQt6.QtWidgets import (
     QFormLayout,
     QLineEdit, QCheckBox
 )
-from cryptography.hazmat.primitives.hashes import SHA256
 
 from gui.widgets.key_usage_widget import KeyUsageWidget
 from gui.widgets.san_widget import SanWidget
