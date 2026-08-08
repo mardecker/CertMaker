@@ -9,8 +9,8 @@ class KeyUsageWidget(QWidget):
         layout = QVBoxLayout(self)
 
         # BEGIN KEY-USAGE
-        KeyUsageGroup = QGroupBox("Key Usage")
-        KeyUsage_layout = QGridLayout()
+        key_usage_group = QGroupBox("Key Usage")
+        key_usage_layout = QGridLayout()
         self.digital_signature = QCheckBox("Digital Signature")
         self.digital_signature.setChecked(True)
         self.key_encipherment = QCheckBox("Key Encipherment")
@@ -18,11 +18,11 @@ class KeyUsageWidget(QWidget):
         self.key_cert_sign = QCheckBox("Key Certificate Signing")
         self.crl_sign = QCheckBox("CRL Signing")
 
-        KeyUsage_layout.addWidget(self.digital_signature,0,0)
-        KeyUsage_layout.addWidget(self.key_encipherment,0,1)
-        KeyUsage_layout.addWidget(self.key_cert_sign,0,2)
-        KeyUsage_layout.addWidget(self.crl_sign,1,0)
-        KeyUsageGroup.setLayout(KeyUsage_layout)
+        key_usage_layout.addWidget(self.digital_signature,0,0)
+        key_usage_layout.addWidget(self.key_encipherment,0,1)
+        key_usage_layout.addWidget(self.key_cert_sign,0,2)
+        key_usage_layout.addWidget(self.crl_sign,1,0)
+        key_usage_group.setLayout(key_usage_layout)
         #END KEY-USAGE
 
         #BEGIN KEY-EXTENDED-USAGE
@@ -44,7 +44,7 @@ class KeyUsageWidget(QWidget):
         KeyExtendedGroup.setLayout(KeyExtended_layout)
         #END KEY-EXTENDED-USAGE
 
-        layout.addWidget(KeyUsageGroup)
+        layout.addWidget(key_usage_group)
         layout.addWidget(KeyExtendedGroup)
 
     def export_key_usage(self) -> KeyUsage:

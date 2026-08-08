@@ -14,18 +14,7 @@ from gui.dialogs.save_dialog import select_private_key_path, select_certificate_
 from crypto.certificate_builder import CertificateBuilder
 from crypto.export import export_certificate, export_pkey, export_pkcs12
 from models.certificate_spec import CertificateSpec
-
-keylengths = {
-    "RSA": ["2048", "3072", "4096"],
-    "ECDSA": ["P-256", "P-384", "P-521"],
-    "ED25519": ["ED25519"],
-}
-
-hash_algorithms = {
-    "RSA": ["SHA-256", "SHA-384", "SHA-512"],
-    "ECDSA": ["SHA-256", "SHA-384", "SHA-512"],
-    "ED25519": ["ED25519"],
-}
+from models.key_specs import key_lengths, hash_algorithms
 
 class CertificatePage(QWidget):
     action_aborted = pyqtSignal()
@@ -68,7 +57,7 @@ class CertificatePage(QWidget):
         self.key_algorithm.currentTextChanged.connect(self.update_crypt_properties)
 
         self.key_specs = QComboBox()
-        self.key_specs.addItems(keylengths[self.key_algorithm.currentText()])
+        self.key_specs.addItems(key_lengths[self.key_algorithm.currentText()])
 
         self.hash_algorithm = QComboBox()
         self.hash_algorithm.addItems(hash_algorithms[self.key_algorithm.currentText()])
@@ -232,6 +221,6 @@ class CertificatePage(QWidget):
 
     def update_crypt_properties(self, algorithm: str):
         self.key_specs.clear()
-        self.key_specs.addItems(keylengths[algorithm])
+        self.key_specs.addItems(key_lengths[algorithm])
         self.hash_algorithm.clear()
         self.hash_algorithm.addItems(hash_algorithms[algorithm])

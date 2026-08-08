@@ -5,27 +5,16 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QVBoxLayout, QGroupBox, QHBoxLayout, QMessageBox, QComboBox,
     QFormLayout,
-    QLineEdit, QCheckBox
+    QLineEdit
 )
 
 from gui.widgets.key_usage_widget import KeyUsageWidget
 from gui.widgets.san_widget import SanWidget
-from gui.dialogs.save_dialog import select_private_key_path, select_certificate_path, select_csr_path
+from gui.dialogs.save_dialog import select_private_key_path, select_csr_path
 from crypto.csr_builder import CSRBuilder
-from crypto.export import export_certificate, export_pkey, export_pkcs12, export_csr
+from crypto.export import export_pkey, export_csr
 from models.csr_spec import CsrSpec
-
-keylengths = {
-    "RSA": ["2048", "3072", "4096"],
-    "ECDSA": ["P-256", "P-384", "P-521"],
-    "ED25519": ["ED25519"],
-}
-
-hash_algorithms = {
-    "RSA": ["SHA-256", "SHA-384", "SHA-512", "bla"],
-    "ECDSA": ["SHA-256", "SHA-384", "SHA-512"],
-    "ED25519": ["ED25519"],
-}
+from models.key_specs import key_lengths, hash_algorithms
 
 class CsrPage(QWidget):
     action_aborted = pyqtSignal()
@@ -60,24 +49,24 @@ class CsrPage(QWidget):
         #END SUBJECT
 
         #BEGIN KEYGROUP
-        keyGroup = QGroupBox("Key")
-        keyLayout = QFormLayout()
+        key_group = QGroupBox("Key")
+        key_layout = QFormLayout()
         self.key_algorithm = QComboBox()
         self.key_algorithm.addItems(["RSA", "ECDSA", "ED25519"])
 
         self.key_algorithm.currentTextChanged.connect(self.update_crypt_properties)
 
         self.key_specs = QComboBox()
-        self.key_specs.addItems(keylengths[self.key_algorithm.currentText()])
+        self.key_specs.addItems(key_lengths[self.key_algorithm.currentText()])
 
         self.hash_algorithm = QComboBox()
         self.hash_algorithm.addItems(hash_algorithms[self.key_algorithm.currentText()])
 
-        keyLayout.addRow("Key Algorithm:", self.key_algorithm)
-        keyLayout.addRow("Key Specs:", self.key_specs)
-        keyLayout.addRow("Hash Algorithm:", self.hash_algorithm)
+        key_layout.addRow("Key Algorithm:", self.key_algorithm)
+        key_layout.addRow("Key Specs:", self.key_specs)
+        key_layout.addRow("Hash Algorithm:", self.hash_algorithm)
 
-        keyGroup.setLayout(keyLayout)
+        key_group.setLayout(key_layout)
         #END KEYGROUP
 
         #BEGIN SANWIDGET
@@ -114,7 +103,7 @@ class CsrPage(QWidget):
 
 
         layout.addWidget(subjectGroup)
-        layout.addWidget(keyGroup)
+        layout.addWidget(key_group)
         layout.addWidget(self.SANWidget)
         layout.addWidget(self.KeyUsageWidget)
         layout.addLayout(Buttons)
@@ -190,6 +179,6 @@ class CsrPage(QWidget):
 
     def update_crypt_properties(self, algorithm: str):
         self.key_specs.clear()
-        self.key_specs.addItems(keylengths[algorithm])
+        self.key_specs.addItems(key_lengths[algorithm])
         self.hash_algorithm.clear()
         self.hash_algorithm.addItems(hash_algorithms[algorithm])
