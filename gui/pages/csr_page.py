@@ -33,7 +33,7 @@ class CsrPage(QWidget):
     def __init__(self):
         super().__init__()
 
-        title = QLabel("CSRMaker")
+        title = QLabel("CSR Creator")
         title.setStyleSheet("font-size:24px; font-weight:bold;")
 
         layout = QVBoxLayout()

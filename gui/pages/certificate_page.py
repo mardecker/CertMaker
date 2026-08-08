@@ -34,7 +34,7 @@ class CertificatePage(QWidget):
     def __init__(self):
         super().__init__()
 
-        title = QLabel("CertMaker")
+        title = QLabel("Self Signer")
         title.setStyleSheet("font-size:24px; font-weight:bold;")
 
         layout = QVBoxLayout()
