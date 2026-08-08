@@ -3,9 +3,9 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mein-projekt"
+name = "CertMaker"
 version = "1.0.0"
-description = "Meine PyQt6-Anwendung"
+description = "Certificate and CSR Creation Tool"
 requires-python = ">=3.10"
 
 dependencies = [
