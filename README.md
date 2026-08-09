@@ -24,3 +24,30 @@ The required dependencies can be installed manually or automatically by installi
 
 ```bash
 pip install .
+```
+
+## Instructions
+
+When Executing the ```main.py```-File, you will be greeted by a select screen in which you may choose to create a new self-signed certificate or a new CSR.
+
+<img width="662" height="660" alt="Select-Screen" src="https://github.com/user-attachments/assets/8948c6e1-8c02-4020-8e36-47cd99dbe169" />
+
+According to your decision, you will be directed to either the _Self Signer_- or _CSR Creator_-From.
+
+### Self Signer
+
+#### Subject
+
+#### Key
+
+#### SAN
+
+#### Key Usage
+
+#### Key Extended Usage 
+
+#### Additional Info
+
+
+
+ 
