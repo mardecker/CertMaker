@@ -31,9 +31,10 @@ class CSRBuilder:
             )
         )
 
-        subject_attributes.append(
-            x509.NameAttribute(NameOID.ORGANIZATION_NAME, self.csr_spec.organization)
-        )
+        if self.csr_spec.organization != "":
+            subject_attributes.append(
+                x509.NameAttribute(NameOID.ORGANIZATION_NAME, self.csr_spec.organization)
+            )
 
         if self.csr_spec.organizational_unit != "":
             subject_attributes.append(

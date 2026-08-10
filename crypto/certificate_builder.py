@@ -33,9 +33,10 @@ class CertificateBuilder:
             )
         )
 
-        subject_attributes.append(
-            x509.NameAttribute(NameOID.ORGANIZATION_NAME, self.certificate_spec.organization)
-        )
+        if self.certificate_spec.organization != "":
+            subject_attributes.append(
+                x509.NameAttribute(NameOID.ORGANIZATION_NAME, self.certificate_spec.organization)
+            )
 
         if self.certificate_spec.organizational_unit != "":
             subject_attributes.append(

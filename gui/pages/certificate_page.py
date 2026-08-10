@@ -38,7 +38,7 @@ class CertificatePage(QWidget):
         self.state= QLineEdit()
         self.country = QLineEdit()
         subject_layout.addRow("*Common Name:", self.common_name)
-        subject_layout.addRow("*Organization:", self.organization)
+        subject_layout.addRow("Organization:", self.organization)
         subject_layout.addRow("OU", self.organization_unit)
         subject_layout.addRow("Locality:", self.locality)
         subject_layout.addRow("State:", self.state)
@@ -194,12 +194,8 @@ class CertificatePage(QWidget):
         QMessageBox().information(self, "Export","Certificate successfully exported")
         return
 
-
-
-
-
     def validate_input(self) -> bool:
-        if not self.common_name.text().strip() or not self.organization.text().strip() or not self.validity_days.text().strip():
+        if not self.common_name.text().strip() or not self.validity_days.text().strip():
             QMessageBox().warning(self, " ", "Please enter all * fields")
             return False
 
